@@ -1,11 +1,7 @@
 pragma solidity =0.6.6;
 
-import 'openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
-import 'openzeppelin-solidity/contracts/crowdsale/validation/PausableCrowdsale.sol';
-import 'openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol';
-import 'openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/IERC20.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/math/SafeMath.sol';
 import './YopoToken.sol';
 import './YopoReferral.sol';
 import './libraries/AdminRole.sol';

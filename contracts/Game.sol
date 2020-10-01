@@ -1,8 +1,8 @@
 pragma solidity =0.6.6;
 
-import 'openzeppelin-solidity/contracts/lifecycle/Pausable.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/utils/Pausable.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './libraries/SafeMath16.sol';
 import './libraries/Rand.sol';
 import './libraries/AdminRole.sol';
@@ -30,7 +30,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     uint8 private constant NUMBER_OF_PROPERTY = 40;
     uint256 public endTime = 0;
 
-    uint16 public constant version = 10000; //v1.0.0
+    uint16 public constant version = 10001; //v1.0.1
     uint24 public round = 0;
     uint16 public steps = 0;
     //uint256 public penaltyPool = 0;

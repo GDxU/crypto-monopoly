@@ -1,12 +1,11 @@
 pragma solidity =0.6.6;
 
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Metadata.sol';
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import './libraries/AdminRole.sol';
 import './PropertyEnumerable.sol';
 
-contract PropertyOwnership is AdminRole, ERC721, ERC721Metadata, PropertyEnumerable {
-    constructor() public ERC721Metadata('MONOPOLY', 'MON') {}
+contract PropertyOwnership is AdminRole, ERC721, PropertyEnumerable {
+    constructor() public ERC721('MONOPOLY', 'MON') {}
 
     function transfer(
         address _from,

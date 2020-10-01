@@ -1,19 +1,17 @@
 pragma solidity =0.6.6;
 
-import 'openzeppelin-solidity/contracts/access/Roles.sol';
+import '@openzeppelin/contracts/access/AccessControl.sol';
 
-contract AdminRole {
-    using Roles for Roles.Role;
+contract AdminRole is AccessControl {
+    // Create a new role identifier for the admin role
+    bytes32 public constant ADMIN_ROLE = keccak256('ADMIN');
 
     event AdminAdded(address indexed account);
     event AdminRemoved(address indexed account);
-
-    Roles.Role private _admins;
-    address payable public me;
+    address payable public me = 0x6666666666666666666666666666666666666666;
 
     constructor() internal {
-        _addAdmin(msg.sender);
-        me = 0x56C4ECf7fBB1B828319d8ba6033f8F3836772FA9;
+        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     modifier onlyAdmin() {
@@ -22,7 +20,7 @@ contract AdminRole {
     }
 
     function isAdmin(address account) public view returns (bool) {
-        return _admins.has(account);
+        return hasRole(ADMIN_ROLE, account);
     }
 
     function addAdmin(address account) public onlyAdmin {
@@ -34,16 +32,16 @@ contract AdminRole {
     }
 
     function _addAdmin(address account) internal {
-        _admins.add(account);
+        grantRole(ADMIN_ROLE, account);
         emit AdminAdded(account);
     }
 
     function _removeAdmin(address account) internal {
-        _admins.remove(account);
+        renounceRole(ADMIN_ROLE, account);
         emit AdminRemoved(account);
     }
 
-    function() external payable {
+    receive() external payable {
         me.transfer(msg.value);
     }
 

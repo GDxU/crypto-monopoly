@@ -1,19 +1,17 @@
 pragma solidity =0.6.6;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
+import '../utils/AdminRole.sol';
 
 /**
- * @title YopoToken
+ * @title ERC20Token
  * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `ERC20` functions.
  */
-contract YopoToken is ERC20Mintable, ERC20Detailed {
-    uint8 private constant DECIMALS = 18;
-    uint256 private constant INITIAL_SUPPLY = 1000 * (10**uint256(DECIMALS)); //(1 ether) * (10 ** uint256(DECIMALS));
+contract ERC20Token is ERC20, AdminRole {
+    uint256 private constant INITIAL_SUPPLY = 1000 * (10**18);
     /* candy cannot convert back to ETH */
     mapping(address => uint256) private _candies;
     uint256 private _release_candies = 0;
@@ -24,7 +22,7 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
     event BurnCandy(address indexed to, uint256 value);
     event Refund(address indexed to, uint256 value);
 
-    constructor() public ERC20Detailed('YopoToken https://richcat.app', 'YOPO', DECIMALS) {
+    constructor() public ERC20('YopoToken https://github.com/coolcode', 'YOPO') {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 
@@ -38,7 +36,7 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
         address from,
         address to,
         uint256 value
-    ) public onlyMinter returns (bool) {
+    ) public onlyAdmin returns (bool) {
         uint256 bal = balanceOf(from);
         if (bal < value) {
             value = bal;
@@ -62,7 +60,7 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
      * @param value The amount that will be burnt.
      * @return A boolean that indicates if the operation was successful.
      */
-    function safeMint(address account, uint256 value) public onlyMinter returns (bool) {
+    function safeMint(address account, uint256 value) public onlyAdmin returns (bool) {
         _mint(account, value);
         _release_token = _release_token.add(value);
         //emit SafeTransfer(address(0), account, value);
@@ -76,7 +74,7 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
      * @param value The amount that will be burnt.
      * @return A boolean that indicates if the operation was successful.
      */
-    function safeBurn(address account, uint256 value) public onlyMinter returns (bool) {
+    function safeBurn(address account, uint256 value) public onlyAdmin returns (bool) {
         _burn(account, value);
         uint256 candyAmount = _candies[account];
         if (candyAmount > 0) {
@@ -99,7 +97,7 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
      * @param value The amount that will be burnt.
      * @return A boolean that indicates if the operation was successful.
      */
-    function safeRefund(address account, uint256 value) public onlyMinter returns (bool) {
+    function safeRefund(address account, uint256 value) public onlyAdmin returns (bool) {
         require(value <= balanceOf(account), 'refund value > balance');
         _burn(account, value);
         emit Refund(account, value);
@@ -113,9 +111,9 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
      * @param value The amount that will be burnt.
      * @return A boolean that indicates if the operation was successful.
      */
-    function sendCandy(address account, uint256 value) external onlyMinter returns (bool) {
+    function sendCandy(address account, uint256 value) external onlyAdmin returns (bool) {
         // uint256 v = _candies[account].add(value);
-        if (!isMinter(account)) {
+        if (!isAdmin(account)) {
             _candies[account] = _candies[account].add(value);
         }
         _mint(account, value);
@@ -141,13 +139,13 @@ contract YopoToken is ERC20Mintable, ERC20Detailed {
         address from,
         address to,
         uint256 value
-    ) internal {
+    ) internal override {
         require(value <= balanceOf(from), 'insufficient balance');
-        if (!isMinter(msg.sender)) {
+        if (!isAdmin(msg.sender)) {
             require(value <= tokenOf(from), 'insufficient token');
         }
 
-        if (isMinter(msg.sender) || isMinter(to)) {
+        if (isAdmin(msg.sender) || isAdmin(to)) {
             //consume candy first
             uint256 candyAmount = _candies[from];
             if (candyAmount > 0) {

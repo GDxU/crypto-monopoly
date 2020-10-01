@@ -1,7 +1,7 @@
 pragma solidity =0.6.6;
 
 import './PropertyBase.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 
 contract PropertyEnumerable is ERC721 {
     // Mapping from owner to list of owned token IDs
@@ -43,7 +43,7 @@ contract PropertyEnumerable is ERC721 {
      * @param index uint256 representing the index to be accessed of the requested tokens list
      * @return uint256 token ID at the given index of the tokens list owned by the requested address
      */
-    function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256) {
+    function tokenOfOwnerByIndex(address owner, uint256 index) public override view returns (uint256) {
         if (index < balanceOf(owner)) {
             return _ownedTokens[owner][index];
         }
@@ -54,7 +54,7 @@ contract PropertyEnumerable is ERC721 {
      * @dev Gets the total amount of tokens stored by the contract
      * @return uint256 representing the total amount of tokens
      */
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public override view returns (uint256) {
         return _allTokens.length;
     }
 
@@ -64,7 +64,7 @@ contract PropertyEnumerable is ERC721 {
      * @param index uint256 representing the index to be accessed of the tokens list
      * @return uint256 token ID at the given index of the tokens list
      */
-    function tokenByIndex(uint256 index) public view returns (uint256) {
+    function tokenByIndex(uint256 index) public override view returns (uint256) {
         require(index < totalSupply(), 'no property');
         return _allTokens[index];
     }
@@ -76,12 +76,12 @@ contract PropertyEnumerable is ERC721 {
      * @param to address to receive the ownership of the given token ID
      * @param tokenId uint256 ID of the token to be transferred
      */
-    function _transferFrom(
+    function _transfer(
         address from,
         address to,
         uint256 tokenId
-    ) internal {
-        super._transferFrom(from, to, tokenId);
+    ) internal override {
+        super._transfer(from, to, tokenId);
 
         _removeTokenFromOwnerEnumeration(from, tokenId);
 
@@ -94,7 +94,7 @@ contract PropertyEnumerable is ERC721 {
      * @param to address the beneficiary that will own the minted token
      * @param tokenId uint256 ID of the token to be minted
      */
-    function _mint(address to, uint256 tokenId) internal {
+    function _mint(address to, uint256 tokenId) internal override {
         super._mint(to, tokenId);
 
         _addTokenToOwnerEnumeration(to, tokenId);
@@ -109,7 +109,7 @@ contract PropertyEnumerable is ERC721 {
      * @param owner owner of the token to burn
      * @param tokenId uint256 ID of the token being burned
      */
-    function _burn(address owner, uint256 tokenId) internal {
+    function _burn(address owner, uint256 tokenId) internal override {
         super._burn(owner, tokenId);
 
         _removeTokenFromOwnerEnumeration(owner, tokenId);
@@ -171,7 +171,7 @@ contract PropertyEnumerable is ERC721 {
         }
 
         // This also deletes the contents at the last position of the array
-        _ownedTokens[from].length--;
+        _ownedTokens[from].pop();
 
         // Note that _ownedTokensIndex[tokenId] hasn't been cleared: it still points to the old slot (now occcupied by
         // lasTokenId, or just over the end of the array if the token was the last one).
@@ -198,7 +198,7 @@ contract PropertyEnumerable is ERC721 {
         _allTokensIndex[lastTokenId] = tokenIndex; // Update the moved token's index
 
         // This also deletes the contents at the last position of the array
-        _allTokens.length--;
+        _allTokens.pop();
         _allTokensIndex[tokenId] = 0;
     }
 }
