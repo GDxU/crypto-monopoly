@@ -1,19 +1,18 @@
 pragma solidity =0.6.6;
 
-import './libraries/AdminRole.sol';
-import './PropertyExchange.sol';
+import './utils/AdminRole.sol';
+import './token/PropertyExchange.sol';
+import './token/ERC20Token.sol';
 
 contract Gov is AdminRole {
-    //mapping(uint24 => mapping(address => bool)) private jailStatus; // round => player address => inJail
-
     PropertyExchange private _pe;
-    YopoToken private _token;
+    ERC20Token private _token;
 
     uint24 public round;
 
     event Fine(uint8 indexed group, address indexed from, uint16 indexed pos, uint256 value);
 
-    constructor(PropertyExchange pe, YopoToken token) public {
+    constructor(PropertyExchange pe, ERC20Token token) public {
         _pe = pe;
         _token = token;
     }
@@ -21,18 +20,6 @@ contract Gov is AdminRole {
     function newRound(uint24 _round) external payable onlyAdmin {
         round = _round;
     }
-
-    //    function getJailedStatus(address _player) external view returns (bool) {
-    //        return jailStatus[round][_player];
-    //    }
-    //
-    //    function inPrison(address _player) external payable onlyAdmin {
-    //        jailStatus[round][_player] = true;
-    //    }
-    //
-    //    function free(address _player) external payable onlyAdmin {
-    //        jailStatus[round][_player] = false;
-    //    }
 
     function meet(uint16 pos) external pure returns (bool) {
         return (pos == 10 || pos == 30);

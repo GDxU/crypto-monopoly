@@ -1,6 +1,6 @@
 pragma solidity =0.6.6;
 
-import './libraries/AdminRole.sol';
+import './utils/AdminRole.sol';
 
 contract UserCenter is AdminRole {
     address[] private _users;

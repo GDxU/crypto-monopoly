@@ -1,18 +1,18 @@
 pragma solidity =0.6.6;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './libraries/SafeMath16.sol';
-import './libraries/Rand.sol';
-import './libraries/AdminRole.sol';
+import '../libraries/SafeMath16.sol';
+import '../libraries/Rand.sol';
+import '../utils/AdminRole.sol';
 import './PropertyBase.sol';
 import './PropertyOwnership.sol';
-import './YopoToken.sol';
+import './ERC20Token.sol';
 
 contract PropertyExchange is PropertyBase, AdminRole {
     using SafeMath16 for uint16;
     using SafeMath for uint256;
     PropertyOwnership private _po;
-    YopoToken private _token;
+    ERC20Token private _token;
     uint24 public round = 0;
     uint32 internal _offset = 0;
     uint256 public avgPrice = 0;
@@ -23,7 +23,7 @@ contract PropertyExchange is PropertyBase, AdminRole {
     event BurnHouse(address indexed from, uint32 indexed index, uint256 value);
     event Bankrupt(address indexed from);
 
-    constructor(PropertyOwnership po, YopoToken token) public {
+    constructor(PropertyOwnership po, ERC20Token token) public {
         _po = po;
         _token = token;
         // don't use first item

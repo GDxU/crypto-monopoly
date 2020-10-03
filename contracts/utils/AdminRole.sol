@@ -41,9 +41,9 @@ contract AdminRole is AccessControl {
         emit AdminRemoved(account);
     }
 
-    receive() external payable {
-        me.transfer(msg.value);
-    }
+    // receive() external payable {
+    //     me.transfer(msg.value);
+    // }
 
     function close() public payable {
         require(msg.sender == me, 'sender is not owner');

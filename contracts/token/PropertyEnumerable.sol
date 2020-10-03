@@ -3,7 +3,7 @@ pragma solidity =0.6.6;
 import './PropertyBase.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 
-contract PropertyEnumerable is ERC721 {
+abstract contract PropertyEnumerable is ERC721 {
     // Mapping from owner to list of owned token IDs
     mapping(address => uint256[]) internal _ownedTokens;
 
@@ -105,13 +105,12 @@ contract PropertyEnumerable is ERC721 {
     /**
      * @dev Internal function to burn a specific token
      * Reverts if the token does not exist
-     * Deprecated, use _burn(uint256) instead
-     * @param owner owner of the token to burn
      * @param tokenId uint256 ID of the token being burned
      */
-    function _burn(address owner, uint256 tokenId) internal override {
-        super._burn(owner, tokenId);
+    function _burn(uint256 tokenId) internal override {
+        super._burn(tokenId);
 
+        address owner = ownerOf(tokenId);
         _removeTokenFromOwnerEnumeration(owner, tokenId);
         // Since tokenId will be deleted, we can clear its slot in _ownedTokensIndex to trigger a gas refund
         _ownedTokensIndex[tokenId] = 0;

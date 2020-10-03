@@ -22,7 +22,7 @@ contract ERC20Token is ERC20, AdminRole {
     event BurnCandy(address indexed to, uint256 value);
     event Refund(address indexed to, uint256 value);
 
-    constructor() public ERC20('YopoToken https://github.com/coolcode', 'YOPO') {
+    constructor() public ERC20('CC Token https://github.com/coolcode', 'CC') {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 

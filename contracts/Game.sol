@@ -5,12 +5,11 @@ import '@openzeppelin/contracts/utils/Pausable.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './libraries/SafeMath16.sol';
 import './libraries/Rand.sol';
-import './libraries/AdminRole.sol';
 import './libraries/TinyArray.sol';
-import './PropertyOwnership.sol';
-import './PropertyExchange.sol';
-import './YopoToken.sol';
-import './YopoCrowdsale.sol';
+import './utils/AdminRole.sol';
+import './token/PropertyOwnership.sol';
+import './token/PropertyExchange.sol';
+import './token/ERC20Token.sol';
 import './UserCenter.sol';
 import './Gov.sol';
 
@@ -22,8 +21,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     TinyArray.Data private _avgPrices;
     PropertyOwnership private _po;
     PropertyExchange private _pe;
-    YopoToken private _token;
-    YopoCrowdsale private _exchange;
+    ERC20Token private _token;
     UserCenter private _uc;
     Gov private _gov;
 
@@ -38,6 +36,8 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     uint32 public maxNumberOfMove = 200;
     uint16 public numberOfProperty = 0;
     uint16 public initAvgPrice = 10;
+
+    uint256 public tax = 0;
 
     event NewGame(address indexed from, uint24 round);
     event Move(address indexed from, uint16 lastPos, uint16 pos, uint8 r1, uint8 r2);
@@ -57,15 +57,13 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     function setup(
         PropertyOwnership po,
         PropertyExchange pe,
-        YopoToken token,
-        YopoCrowdsale exchange,
+        ERC20Token token,
         UserCenter uc,
         Gov gov
     ) public onlyAdmin {
         _po = po;
         _pe = pe;
         _token = token;
-        _exchange = exchange;
         _uc = uc;
         _gov = gov;
         _newGame();
@@ -86,7 +84,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         emit NewGame(msg.sender, round);
     }
 
-    function() external payable onlyMember {
+    receive() external payable onlyMember {
         move();
     }
 
@@ -215,7 +213,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
 
         if (_owner == address(0) || _owner == address(this)) {
             // new house
-            _exchange.payTax(msg.sender, token_buy / 10);
+            _payTax(msg.sender, token_buy / 10);
             _token.safeTransfer(msg.sender, address(this), token_buy.sub(token_buy / 10));
             //_propertyPositions[round].push(_pos);
             //_propertyIndexes[round][_pos] = _pe.propertyId(_pos);//1;//_index;
@@ -224,7 +222,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
             // pay to game
             uint256 _tax = token_buy / 15;
             uint256 _gameProfit = token_buy / 10;
-            _exchange.payTax(msg.sender, _tax);
+            _payTax(msg.sender, _tax);
             _token.safeTransfer(msg.sender, address(this), _gameProfit);
             _token.safeTransfer(msg.sender, _owner, token_buy.sub(_tax).sub(_gameProfit));
         }
@@ -364,7 +362,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         _total = bonusPool();
 
         //10% for the commission
-        _exchange.payTax(address(this), _total / 10);
+        _payTax(address(this), _total / 10);
 
         //60%
         uint256 bonus = _total.mul(60).div(100);
@@ -373,6 +371,11 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         //30% left for the next game's bonus
 
         emit Win(_winner, round, bonus, _num, now);
+    }
+
+    function _payTax(address _from, uint256 _amount) private {
+        tax = tax.add(_amount);
+        _token.safeBurn(_from, _amount);
     }
 
     function _getWinner()

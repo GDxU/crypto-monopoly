@@ -1,12 +1,12 @@
 pragma solidity =0.6.6;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './YopoToken.sol';
-import './libraries/AdminRole.sol';
+import './ERC20Token.sol';
+import '../utils/AdminRole.sol';
 
-contract YopoReferral is AdminRole {
+contract ERC20Referral is AdminRole {
     using SafeMath for uint256;
-    YopoToken private _token;
+    ERC20Token private _token;
     uint16 private _referral_rate = 5;
     bool private _promo = true;
     mapping(address => address) private _referral_map;
@@ -14,7 +14,7 @@ contract YopoReferral is AdminRole {
 
     event TokensReferral(address indexed to, uint256 value);
 
-    constructor(YopoToken token) public {
+    constructor(ERC20Token token) public {
         _token = token;
     }
 
