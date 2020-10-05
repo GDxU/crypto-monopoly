@@ -39,7 +39,7 @@
     "copy-v1-artifacts": "ncp ./buildV1 ./build",
     "precompile": "yarn clean",
     "compile": "waffle",
-    "postcompile": "echo 'compiled'",
+    "postcompile": "# compiled",
     "pretest": "yarn compile",
     "test": "mocha",
     "test-game": "mocha test/Monopoly.spec",

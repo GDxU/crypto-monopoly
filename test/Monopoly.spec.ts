@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai'
-import { Contract, BigNumber, Wallet } from 'ethers'
+import { Contract, Wallet } from 'ethers'
 import { solidity, MockProvider, deployContract } from 'ethereum-waffle'
 import { ether, toEther } from './shared/util'
 
@@ -33,9 +33,9 @@ describe('MonopolyTest', () => {
     const player2 = p2.address
     const arr = [wallet, p0, p1, p2]
     const wallets: Record<string, Wallet> = {}
-    arr.forEach(el => {
-        wallets[el.address] = el
-    })
+    for (const w of [wallet, p0, p1, p2]) {
+        wallets[w.address] = w
+    }
 
     let game: Contract
     let token: Contract
@@ -44,7 +44,7 @@ describe('MonopolyTest', () => {
     let pe: Contract
     let gov: Contract
 
-    beforeEach(async function() {
+    beforeEach(async function () {
         console.info(`${deployer}: ${await wallet.getBalance()}`)
 
         // const deployerOptions = { ...overrides, from: await wallet.getAddress() }
@@ -91,7 +91,7 @@ describe('MonopolyTest', () => {
         console.info(`***************** #${num} round=${round}, (${msg} move and buy)**********************`)
         let pos = await uc.getPos(_account, round)
         console.info(`from pos: ${pos}`)
-        //await game.moveTo(r1, r2, {...overrides, from: _account});
+        //await game.connect(playerWallect).moveTo(r1, r2, moveOptions)
         await game.connect(playerWallect).move(moveOptions)
         round = await game.round()
         pos = await uc.getPos(_account, round)

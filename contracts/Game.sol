@@ -90,19 +90,15 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
 
     function move() public payable onlyMember {
         (uint8 r1, uint8 r2) = _roll2();
-        _move(r1, r2, false);
+        _move(r1, r2);
     }
 
     // *********** for test only ****************/
-    function moveTo(uint8 r1, uint8 r2) public payable onlyMember {
-        _move(r1, r2, true);
-    }
+    // function moveTo(uint8 r1, uint8 r2) public payable onlyMember {
+    //     _move(r1, r2);
+    // }
 
-    function _move(
-        uint8 r1,
-        uint8 r2,
-        bool fixedMove
-    ) private {
+    function _move(uint8 r1, uint8 r2) private {
         uint16 pos = 0;
         uint16 total_steps = 0;
 
@@ -116,11 +112,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         uint16 roll_sum = _rollSum(r1, r2);
         uint16 roll_value = _rollValue(r1, r2);
 
-        //        if (pos == 0 && total_steps == 0 && !fixedMove) {
-        //            // random move
-        //            pos = (roll_value % 4) * (NUMBER_OF_PROPERTY >> 2);
-        //        }
-
         uint16 lastPos = pos;
         pos = pos + roll_sum;
 
@@ -128,6 +119,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
             // last position
             pos = pos - NUMBER_OF_PROPERTY;
         }
+
         total_steps = total_steps.add(roll_sum);
         steps = steps.add(roll_sum);
         _uc.setUserInfo(msg.sender, pos, total_steps, roll_value, round);
@@ -366,6 +358,8 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
 
     function _award() private {
         (address _winner, uint16 _num, uint256 _fund, uint256 _total) = _getWinner();
+        require(_fund > 0, 'invalid fund');
+
         // no one wins
         if (_winner == address(0)) {
             emit Win(_winner, round, _total, _num, now);
