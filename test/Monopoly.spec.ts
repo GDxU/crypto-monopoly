@@ -154,7 +154,6 @@ describe('MonopolyTest', () => {
         console.info(`p0 balance: ${await balOf(investor)}`)
         console.info(`p1 balance: ${await balOf(player1)}`)
         console.info(`p2 balance: ${await balOf(player2)}`)
-        // console.info(`poorman balance: ${(await balOf(poorman))}`);
         console.info(`game balance: ${await balOf(game.address)}`)
         await token.transfer(game.address, ether(9999), { from: deployer })
         console.info(`game balance: ${await balOf(game.address)}`)
@@ -166,7 +165,6 @@ describe('MonopolyTest', () => {
             await move(investor, 1, 2, 'p0')
             await move(player1, 1, 2, 'p1')
             await move(player2, 1, 2, 'p2')
-            //await this.move(poorman, 1, 2, "poorman");
             console.info(`****************** NEXT ${i} *********************`)
         }
     })
