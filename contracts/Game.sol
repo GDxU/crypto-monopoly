@@ -94,9 +94,9 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     }
 
     // *********** for test only ****************/
-    //    function moveTo(uint8 r1, uint8 r2) public payable onlyMember {
-    //        _move(r1, r2, true);
-    //    }
+    function moveTo(uint8 r1, uint8 r2) public payable onlyMember {
+        _move(r1, r2, true);
+    }
 
     function _move(
         uint8 r1,
@@ -148,7 +148,8 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
             return;
         } else if (_isLottery(pos)) {
             uint256 _bonus = _lotteryReward();
-            _token.safeTransfer(address(this), msg.sender, _bonus);
+
+            _rewardToken(msg.sender, _bonus);
             emit Reward(1, msg.sender, pos, _bonus);
         } else if (_isQuestionMark(pos)) {
             uint16 fee_question = _questionMarkFee();
@@ -156,7 +157,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
             uint256 n = Rand.rand();
             if ((n % 10) < 4) {
                 // 40% reward
-                _token.safeTransfer(address(this), msg.sender, token_question);
+                _rewardToken(msg.sender, token_question);
                 emit Reward(2, msg.sender, pos, token_question);
             } else {
                 _gov.fine(2, msg.sender, address(this), pos, token_question);
@@ -182,11 +183,11 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
                         // rent
                         // 12.5% to bonus pool
                         uint256 _bonus = token_rent >> 3;
-                        _token.safeTransfer(msg.sender, _owner, token_rent.sub(_bonus));
-                        _token.safeTransfer(msg.sender, address(this), _bonus);
+                        _transferToken(_owner, token_rent.sub(_bonus));
+                        _transferToken(address(this), _bonus);
                     } else {
                         // owner is in jail, pay to prize pool
-                        _token.safeTransfer(msg.sender, address(this), token_rent);
+                        _transferToken(address(this), token_rent);
                     }
                     emit PayRent(msg.sender, pos, rent_fee);
                 }
@@ -214,7 +215,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         if (_owner == address(0) || _owner == address(this)) {
             // new house
             _payTax(msg.sender, token_buy / 10);
-            _token.safeTransfer(msg.sender, address(this), token_buy.sub(token_buy / 10));
+            _transferToken(address(this), token_buy.sub(token_buy / 10));
             //_propertyPositions[round].push(_pos);
             //_propertyIndexes[round][_pos] = _pe.propertyId(_pos);//1;//_index;
             numberOfProperty++;
@@ -223,8 +224,8 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
             uint256 _tax = token_buy / 15;
             uint256 _gameProfit = token_buy / 10;
             _payTax(msg.sender, _tax);
-            _token.safeTransfer(msg.sender, address(this), _gameProfit);
-            _token.safeTransfer(msg.sender, _owner, token_buy.sub(_tax).sub(_gameProfit));
+            _transferToken(address(this), _gameProfit);
+            _transferToken(_owner, token_buy.sub(_tax).sub(_gameProfit));
         }
 
         _index = _pe.propertyId(_pos);
@@ -278,6 +279,18 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     }
 
     /*************************** private *****************************************/
+
+    function _rewardToken(address _receiver, uint256 _amount) private returns (bool) {
+        return _token.transfer(_receiver, _amount);
+    }
+
+    function _transferToken(address _receiver, uint256 _amount) private returns (bool) {
+        _token.safeTransfer(msg.sender, _receiver, _amount);
+        // require(_token.approve(address(this), _amount), 'Fails to approve [Game]');
+
+        // return _token.transferFrom(msg.sender, _receiver, _amount);
+    }
+
     function _rollValue(uint8 r1, uint8 r2) private pure returns (uint16) {
         return uint16((r1 << 3) | r2);
     }
@@ -366,7 +379,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
 
         //60%
         uint256 bonus = _total.mul(60).div(100);
-        _token.safeTransfer(address(this), _winner, bonus);
+        _rewardToken(_winner, bonus);
 
         //30% left for the next game's bonus
 

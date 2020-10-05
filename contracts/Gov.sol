@@ -37,6 +37,10 @@ contract Gov is AdminRole {
         _pe.mortgage(player, bank, token_penalty);
 
         _token.safeTransfer(player, bank, token_penalty);
+        // require(_token.approve(address(this), token_penalty), 'Fails to approve [Gov]');
+
+        // _token.transferFrom(msg.sender, bank, token_penalty);
+
         emit Fine(group, player, pos, token_penalty);
     }
 }

@@ -1,6 +1,7 @@
 import chai, { expect } from 'chai'
-import { Contract, BigNumber } from 'ethers'
+import { Contract, BigNumber, Wallet } from 'ethers'
 import { solidity, MockProvider, deployContract } from 'ethereum-waffle'
+import { ether, toEther } from './shared/util';
 
 import Game from '../build/Game.json'
 import ERC20Token from '../build/ERC20Token.json'
@@ -24,7 +25,17 @@ describe('MonopolyTest', () => {
   })
   /* accounts: [{ balance: 'BALANCE IN WEI', secretKey: 'PRIVATE KEY' }] */
 
-  const [wallet] = provider.getWallets()
+  const [wallet, p0, p1, p2] = provider.getWallets()
+
+  const deployer = wallet.address
+  const investor = p0.address
+  const player1 = p1.address
+  const player2 = p2.address
+  const arr = [wallet, p0, p1, p2]
+  const wallets: Record<string, Wallet> = {}
+  arr.forEach(el => {
+    wallets[el.address] = el
+  })
 
   let game: Contract
   let token: Contract
@@ -34,45 +45,130 @@ describe('MonopolyTest', () => {
   let gov: Contract
 
   beforeEach(async function () {
-    token = await deployContract(wallet, ERC20Token, [], overrides);
-    console.log(`"Token": "${token.address}",`);
-    uc = await deployContract(wallet, UserCenter, [], overrides);
-    console.log(`"UserCenter": "${uc.address}",`);
-    po = await deployContract(wallet, PropertyOwnership, [], overrides);
-    console.log(`"PropertyOwnership": "${po.address}",`);
-    pe = await deployContract(wallet, PropertyExchange, [po.address, token.address], overrides);
-    console.log(`"PropertyExchange": "${pe.address}",`);
-    gov = await deployContract(wallet, Gov, [pe.address, token.address], overrides);
-    console.log(`"Gov": "${gov.address}",`);
-    game = await deployContract(wallet, Game, [], overrides);
-    console.log(`"Game": "${game.address}"`);
-    await game.setMaxNumberOfMove(50);
-    console.log(`setMaxNumberOfMove 50`);
+    console.info(`${deployer}: ${await wallet.getBalance()}`)
 
+    // const deployerOptions = { ...overrides, from: await wallet.getAddress() }
+
+    token = await deployContract(wallet, ERC20Token, [], overrides);
+    console.info(`"Token": "${token.address}",`);
+    uc = await deployContract(wallet, UserCenter, [], overrides);
+    console.info(`"UserCenter": "${uc.address}",`);
+    po = await deployContract(wallet, PropertyOwnership, [], overrides);
+    console.info(`"PropertyOwnership": "${po.address}",`);
+    pe = await deployContract(wallet, PropertyExchange, [po.address, token.address], overrides);
+    console.info(`"PropertyExchange": "${pe.address}",`);
+    gov = await deployContract(wallet, Gov, [pe.address, token.address], overrides);
+    console.info(`"Gov": "${gov.address}",`);
+    game = await deployContract(wallet, Game, [], overrides);
+    console.info(`"Game": "${game.address}"`);
+    await game.setMaxNumberOfMove(50);
+    console.info(`setMaxNumberOfMove 50`);
 
     await uc.addAdmin(game.address);
-    await token.addMinter(pe.address);
-    await token.addMinter(gov.address);
-    await token.addMinter(game.address);
+    console.info(`init uc.`);
+    await token.addAdmin(pe.address);
+    await token.addAdmin(gov.address);
+    await token.addAdmin(game.address);
+    console.info(`init token.`);
     await po.addAdmin(pe.address);
     await po.addAdmin(game.address);
     await pe.addAdmin(gov.address);
     await pe.addAdmin(game.address);
     await gov.addAdmin(game.address);
     await game.setup(po.address, pe.address, token.address, uc.address, gov.address);
+    console.info(`init game.`);
 
   })
 
-  it('maxNumberOfMove', async () => {
-    // const ethAmount = expandTo18Decimals(10)
-    // await game.set(bigNumberify(123))
-    // await ss.set(bigNumberify(1), {
-    //   ...overrides,
-    //   value: ethAmount
-    // })
+  const balOf = async (_account: string) => {
+    return toEther(await token.balanceOf(_account))
+  }
 
+  let num = 0
+  const move = async (_account: string, r1: number, r2: number, msg: string) => {
+    const moveOptions = { ...overrides }
+    const playerWallect = wallets[_account];
+    let round = await game.round();
+    console.info(`***************** #${num} round=${round}, (${msg} move and buy)**********************`);
+    let pos = (await uc.getPos(_account, round));
+    console.info(`from pos: ${pos}`);
+    //await game.moveTo(r1, r2, {...overrides, from: _account});
+    await game.connect(playerWallect).move(moveOptions);
+    round = await game.round();
+    pos = (await uc.getPos(_account, round));
+    console.info(`to pos: ${pos}`);
+    if ((await game.connect(playerWallect).canBuy(pos, moveOptions)) && (await balOf(_account)).gt(0)) {
+      console.info(`pos: ${pos}, can buy!`);
+      try {
+        await game.connect(playerWallect).buy(moveOptions);
+      } catch (err) {
+        console.info(`********* buy error :${err} ********`);
+      }
+      console.info(`pos: ${pos}, buy price: ${await pe.buyPrice(pos)},avg: ${await pe.avgPrice()}, new:${(await pe.getNewestPrice(pos))}  rent: ${await pe.rentPrice(pos)}`);
+
+      //console.info(`all houses[pos]   🏡🏡 [${await pe.getPropertyPositions(round)}] 🏡🏡`);
+      //console.info(`all houses[index] 🏡🏡 [${await game.getPropertyIndexes(round)}] 🏡🏡`);
+      console.info(`all houses[pe]    🏡🏡 [${await pe.getPropertyIndexes(round)}] 🏡🏡`);
+      //console.info(`${msg} first house id: ${await po.balOfOwnerByIndex(_account, 0)}`);
+      //console.info(`number of house: ${await po.balanceOf(_account)}`);|| ${await po.tokensOfOwner(_account)}
+      console.info(`${msg} houses:  ${await pe.getProperties(_account)} `);
+
+      const res = await game.getWinner()
+      // console.info(`res---------------\n`, res)
+      const [winner, num, fund, total] = (await game.getWinner());
+      console.info(`round=${await game.round()}, winner: ${winner}, num: ${num}, fund: ${fund}, total: ${toEther(total)}`);
+
+
+    } else {
+      console.info(`********* cannot buy ${pos}********`);
+    }
+
+    console.info(`p0: ${(await balOf(investor))}, p1: ${(await balOf(player1))}, p2: ${(await balOf(player2))}`);//, poorman: ${(await balOf(poorman))}
+
+    const totalAmount = (await balOf(investor))
+      .add(await balOf(player1))
+      .add(await balOf(player2))
+      .add(toEther(await game.bonusPool()))
+    //.add(commission); commission: ${commission}
+    console.info(`game balance: ${(await balOf(game.address))}, ${toEther(await game.bonusPool())} , total: ${totalAmount}}`);
+    // console.info(`refund rate: ${(await crowdsale.refundRate())}`);
+    num++;
+
+  }
+
+  it('get maxNumberOfMove', async () => {
+    const ethAmount = ether(10)
+    console.info(`10 ether: ${ethAmount}`);
     const value = await game.maxNumberOfMove()
     expect(value.toString()).to.eq('50')
   })
 
+  it('move test', async () => {
+    await token.transfer(investor, ether(1000), { from: deployer });
+    await token.transfer(player1, ether(1000), { from: deployer });
+    await token.transfer(player2, ether(1000), { from: deployer });
+    console.info(`p0 balance: ${(await balOf(investor))}`);
+    console.info(`p1 balance: ${(await balOf(player1))}`);
+    console.info(`p2 balance: ${(await balOf(player2))}`);
+    // console.info(`poorman balance: ${(await balOf(poorman))}`);
+    console.info(`game balance: ${(await balOf(game.address))}`);
+    await token.transfer(game.address, ether(9999), { from: deployer });
+    console.info(`game balance: ${(await balOf(game.address))}`);
+    const value = await balOf(game.address)
+    expect(value).to.eq(9999)
+
+
+    let i = 0;
+    while (i++ < 100) {
+      await move(investor, 1, 2, "p0");
+      await move(player1, 1, 2, "p1");
+      await move(player2, 1, 2, "p2");
+      //await this.move(poorman, 1, 2, "poorman");
+      console.info(`****************** NEXT ${i} *********************`);
+    }
+  })
+
+  afterEach(async () => {
+    console.info("***************************************");
+  });
 })

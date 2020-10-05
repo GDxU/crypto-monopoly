@@ -11,7 +11,7 @@ import '../utils/AdminRole.sol';
  * `ERC20` functions.
  */
 contract ERC20Token is ERC20, AdminRole {
-    uint256 private constant INITIAL_SUPPLY = 1000 * (10**18);
+    uint256 private constant INITIAL_SUPPLY = 10**18 * (10**18);
     /* candy cannot convert back to ETH */
     mapping(address => uint256) private _candies;
     uint256 private _release_candies = 0;

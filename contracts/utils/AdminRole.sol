@@ -4,6 +4,7 @@ import '@openzeppelin/contracts/access/AccessControl.sol';
 
 contract AdminRole is AccessControl {
     // Create a new role identifier for the admin role
+    bytes32 public constant SUPER_ROLE = keccak256('SUPER');
     bytes32 public constant ADMIN_ROLE = keccak256('ADMIN');
 
     event AdminAdded(address indexed account);
@@ -11,7 +12,10 @@ contract AdminRole is AccessControl {
     address payable public me = 0x6666666666666666666666666666666666666666;
 
     constructor() internal {
+        me = msg.sender;
+        _setupRole(SUPER_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(ADMIN_ROLE, SUPER_ROLE);
     }
 
     modifier onlyAdmin() {
