@@ -1,11 +1,6 @@
 import chai, { expect } from 'chai'
 import { Contract, BigNumber } from 'ethers'
-// import { MaxUint256 } from 'ethers/constants'
-// import { defaultAbiCoder, formatEther } from 'ethers/lib/utils'
-import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
-
-// import { expandTo18Decimals } from './shared/utilities'
-// import { v2Fixture } from './shared/fixtures'
+import { solidity, MockProvider, deployContract } from 'ethereum-waffle'
 
 import Game from '../build/Game.json'
 import ERC20Token from '../build/ERC20Token.json'
