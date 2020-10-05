@@ -1,6 +1,6 @@
-pragma solidity =0.6.6;
+pragma solidity ^0.6.0;
 
-import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+// import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '../utils/AdminRole.sol';
 import './PropertyEnumerable.sol';
 

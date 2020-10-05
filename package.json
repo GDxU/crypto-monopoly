@@ -15,14 +15,14 @@
     "contracts"
   ],
   "dependencies": {
-    "@uniswap/lib": "1.1.1",
-    "@openzeppelin/contracts": "3.2.0"
+    "@openzeppelin/contracts": "3.1.0",
+    "@uniswap/lib": "1.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.6",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
-    "ethereum-waffle": "^2.4.1",
+    "ethereum-waffle": "^3.1.1",
     "ethereumjs-util": "^6.2.0",
     "mocha": "^6.2.2",
     "ncp": "^2.0.0",
@@ -38,10 +38,11 @@
     "clean": "rimraf ./build/",
     "copy-v1-artifacts": "ncp ./buildV1 ./build",
     "precompile": "yarn clean",
-    "compile": "waffle .waffle.json",
-    "postcompile": "echo 'compile ...'",
+    "compile": "waffle",
+    "postcompile": "echo 'compiled'",
     "pretest": "yarn compile",
     "test": "mocha",
+    "test-game": "mocha test/Monopoly.spec",
     "prepublishOnly": "yarn test"
   },
   "license": "GPL-3.0-or-later"

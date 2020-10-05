@@ -1,4 +1,4 @@
-pragma solidity =0.6.6;
+pragma solidity ^0.6.0;
 
 library Rand {
     function rand() internal view returns (uint256) {

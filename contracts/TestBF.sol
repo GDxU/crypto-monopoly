@@ -1,4 +1,4 @@
-pragma solidity =0.6.6;
+pragma solidity ^0.6.0;
 
 contract TestBF {
     function avg_tran(address[] memory dists) public payable {

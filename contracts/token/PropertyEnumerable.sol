@@ -1,7 +1,9 @@
-pragma solidity =0.6.6;
+pragma solidity ^0.6.0;
 
-import './PropertyBase.sol';
-import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+// import './PropertyBase.sol';
+import './ERC721.sol';
+
+// import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 
 abstract contract PropertyEnumerable is ERC721 {
     // Mapping from owner to list of owned token IDs
