@@ -48,6 +48,19 @@ describe('MonopolyTest', () => {
     console.log(`"Game": "${game.address}"`);
     await game.setMaxNumberOfMove(50);
     console.log(`setMaxNumberOfMove 50`);
+
+
+    await uc.addAdmin(game.address);
+    await token.addMinter(pe.address);
+    await token.addMinter(gov.address);
+    await token.addMinter(game.address);
+    await po.addAdmin(pe.address);
+    await po.addAdmin(game.address);
+    await pe.addAdmin(gov.address);
+    await pe.addAdmin(game.address);
+    await gov.addAdmin(game.address);
+    await game.setup(po.address, pe.address, token.address, uc.address, gov.address);
+
   })
 
   it('maxNumberOfMove', async () => {
