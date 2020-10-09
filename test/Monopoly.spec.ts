@@ -43,7 +43,7 @@ describe('MonopolyTest', () => {
     let pe: Contract
     let gov: Contract
 
-    beforeEach(async function () {
+    beforeEach(async function() {
         console.info(`${deployer}: ${await wallet.getBalance()}`)
 
         // const deployerOptions = { ...overrides, from: await wallet.getAddress() }
