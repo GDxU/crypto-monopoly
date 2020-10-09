@@ -31,7 +31,6 @@ describe('MonopolyTest', () => {
     const investor = p0.address
     const player1 = p1.address
     const player2 = p2.address
-    const arr = [wallet, p0, p1, p2]
     const wallets: Record<string, Wallet> = {}
     for (const w of [wallet, p0, p1, p2]) {
         wallets[w.address] = w
@@ -44,7 +43,7 @@ describe('MonopolyTest', () => {
     let pe: Contract
     let gov: Contract
 
-    beforeEach(async function() {
+    beforeEach(async function () {
         console.info(`${deployer}: ${await wallet.getBalance()}`)
 
         // const deployerOptions = { ...overrides, from: await wallet.getAddress() }
@@ -80,6 +79,10 @@ describe('MonopolyTest', () => {
     })
 
     const balOf = async (_account: string) => {
+        return await token.balanceOf(_account)
+    }
+
+    const balEther = async (_account: string) => {
         return toEther(await token.balanceOf(_account))
     }
 
@@ -126,23 +129,21 @@ describe('MonopolyTest', () => {
             console.info(`********* cannot buy ${pos}********`)
         }
 
-        console.info(`p0: ${await balOf(investor)}, p1: ${await balOf(player1)}, p2: ${await balOf(player2)}`) //, poorman: ${(await balOf(poorman))}
+        console.info(`p0: ${await balEther(investor)}, p1: ${await balEther(player1)}, p2: ${await balEther(player2)}`) //, poorman: ${(await balOf(poorman))}
 
         const totalAmount = (await balOf(investor))
             .add(await balOf(player1))
             .add(await balOf(player2))
-            .add(toEther(await game.bonusPool()))
-        //.add(commission); commission: ${commission}
+            .add(await game.bonusPool())
+
         console.info(
-            `game balance: ${await balOf(game.address)}, ${toEther(await game.bonusPool())} , total: ${totalAmount}}`
+            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(totalAmount)}}`
         )
-        // console.info(`refund rate: ${(await crowdsale.refundRate())}`);
+
         num++
     }
 
     it('get maxNumberOfMove', async () => {
-        const ethAmount = ether(10)
-        console.info(`10 ether: ${ethAmount}`)
         const value = await game.maxNumberOfMove()
         expect(value.toString()).to.eq('50')
     })
@@ -151,14 +152,14 @@ describe('MonopolyTest', () => {
         await token.transfer(investor, ether(1000), { from: deployer })
         await token.transfer(player1, ether(1000), { from: deployer })
         await token.transfer(player2, ether(1000), { from: deployer })
-        console.info(`p0 balance: ${await balOf(investor)}`)
-        console.info(`p1 balance: ${await balOf(player1)}`)
-        console.info(`p2 balance: ${await balOf(player2)}`)
-        console.info(`game balance: ${await balOf(game.address)}`)
+        console.info(`p0 balance: ${await balEther(investor)}`)
+        console.info(`p1 balance: ${await balEther(player1)}`)
+        console.info(`p2 balance: ${await balEther(player2)}`)
+        console.info(`game balance: ${await balEther(game.address)}`)
         await token.transfer(game.address, ether(9999), { from: deployer })
-        console.info(`game balance: ${await balOf(game.address)}`)
+        console.info(`game balance: ${await balEther(game.address)}`)
         const value = await balOf(game.address)
-        expect(value).to.eq(9999)
+        expect(value).to.eq(ether(9999))
 
         let i = 0
         while (i++ < 100) {
