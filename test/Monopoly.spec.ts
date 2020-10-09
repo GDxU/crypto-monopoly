@@ -137,7 +137,9 @@ describe('MonopolyTest', () => {
             .add(await game.bonusPool())
 
         console.info(
-            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(totalAmount)}}`
+            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(
+                totalAmount
+            )}}`
         )
 
         num++
