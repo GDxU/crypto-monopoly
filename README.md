@@ -1,5 +1,7 @@
 # Crypto Monopoly Game
-Crypto Monopoly Game (Smart Contracts + UI)
+Crypto Monopoly Game (Smart Contracts)
+- ERC20:  Game Token
+- ERC721: Property
 
 # Local Development
 
