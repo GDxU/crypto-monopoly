@@ -1,7 +1,7 @@
 # Crypto Monopoly Game
 Crypto Monopoly Game (Smart Contracts)
 - ERC20:  Game Token
-- ERC721: Property
+- ERC721: NFT Property
 - Solidity: ^0.6.6
 - Tool:  ethereum-waffle
 - UnitTest: TypeScript + mocha + chai
