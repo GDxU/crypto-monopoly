@@ -90,10 +90,10 @@ contract PropertyExchange is PropertyBase, AdminRole {
             }
         }
 
-        uint256 bal = _token.balanceOf(msg.sender);
+        uint256 bal = _token.balanceOf(player);
         if (bal <= token_load) {
             // bankrupt
-            emit Bankrupt(msg.sender);
+            emit Bankrupt(player);
         }
     }
 
@@ -247,7 +247,6 @@ contract PropertyExchange is PropertyBase, AdminRole {
     function _levy(address from, uint32 index) internal {
         _po.transfer(from, address(0), index);
         properties[index] = 0;
-        //TODO change get pos method
         _propertyIndexes[round][_getPos(index)] = 0;
         _setIndex(0, index);
     }

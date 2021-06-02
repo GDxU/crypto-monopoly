@@ -42,8 +42,13 @@
     "postcompile": "# compiled",
     "pretest": "yarn compile",
     "test": "mocha",
-    "test-erc20-token": "mocha -g ERC20Token",
-    "test-game": "mocha test/Monopoly.IntegrationTest.spec",
+    "test-erc20": "mocha -g ERC20Token",
+    "test-gov": "mocha -g Gov",
+    "test-nft": "mocha -g NFT",
+    "test-user-center": "mocha -g UserCenter",
+    "test-property-exchange": "mocha -g PropertyExchange",
+    "test-game": "mocha -g 'Monopoly UnitTest'",
+    "test-integration": "mocha --file test/Monopoly.IntegrationTest.ts",
     "prepublishOnly": "yarn test"
   },
   "license": "GPL-3.0-or-later"

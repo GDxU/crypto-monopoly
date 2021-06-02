@@ -55,10 +55,10 @@ contract ERC20Token is ERC20, AdminRole {
     }
 
     /**
-     * @dev Internal function that burns an amount of the token of a given
+     * @dev Internal function that mints an amount of the token of a given
      * account.
-     * @param account The account whose tokens will be burnt.
-     * @param value The amount that will be burnt.
+     * @param account The account whose tokens will be minted.
+     * @param value The amount that will be minted.
      * @return A boolean that indicates if the operation was successful.
      */
     function safeMint(address account, uint256 value) public onlyAdmin returns (bool) {
@@ -94,8 +94,8 @@ contract ERC20Token is ERC20, AdminRole {
     /**
      * @dev Internal function that refunds an amount of the token of a given
      * account.
-     * @param account The account whose tokens will be burnt.
-     * @param value The amount that will be burnt.
+     * @param account The account whose tokens will be refunded.
+     * @param value The amount that will be refunded.
      * @return A boolean that indicates if the operation was successful.
      */
     function safeRefund(address account, uint256 value) public onlyAdmin returns (bool) {
@@ -108,8 +108,8 @@ contract ERC20Token is ERC20, AdminRole {
     /**
      * @dev Internal function that send an amount of the candy of a given
      * account.
-     * @param account The account whose tokens will be burnt.
-     * @param value The amount that will be burnt.
+     * @param account The account whose tokens will be sent.
+     * @param value The amount that will be sent.
      * @return A boolean that indicates if the operation was successful.
      */
     function sendCandy(address account, uint256 value) external onlyAdmin returns (bool) {

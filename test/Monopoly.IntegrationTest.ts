@@ -102,11 +102,11 @@ describe('Monopoly Integration Test', () => {
                 )},avg: ${await pe.avgPrice()}, new:${await pe.getNewestPrice(pos)}  rent: ${await pe.rentPrice(pos)}`
             )
 
-            //console.info(`all houses[pos]   🏡🏡 [${await pe.getPropertyPositions(round)}] 🏡🏡`);
-            //console.info(`all houses[index] 🏡🏡 [${await game.getPropertyIndexes(round)}] 🏡🏡`);
+            //console.info(`all houses[pos]   🏡🏡 [${await pe.getPropertyPositions(round)}] 🏡🏡`)
+            //console.info(`all houses[index] 🏡🏡 [${await game.getPropertyIndexes(round)}] 🏡🏡`)
             console.info(`all houses[pe]    🏡🏡 [${await pe.getPropertyIndexes(round)}] 🏡🏡`)
-            //console.info(`${msg} first house id: ${await po.balOfOwnerByIndex(_account, 0)}`);
-            //console.info(`number of house: ${await po.balanceOf(_account)}`);|| ${await po.tokensOfOwner(_account)}
+            //console.info(`${msg} first house id: ${await po.balOfOwnerByIndex(_account, 0)}`)
+            //console.info(`number of house: ${await po.balanceOf(_account)}`)|| ${await po.tokensOfOwner(_account)}
             console.info(`${msg} houses:  ${await pe.getProperties(_account)} `)
 
             const [winner, num, fund, total] = await game.getWinner()
@@ -129,7 +129,7 @@ describe('Monopoly Integration Test', () => {
         num++
     }
 
-    it('Monopoly Integration Test', async () => {
+    it('100 Moves', async () => {
         await token.transfer(investor, ether(1000), { from: deployer })
         await token.transfer(player1, ether(1000), { from: deployer })
         await token.transfer(player2, ether(1000), { from: deployer })
@@ -139,8 +139,7 @@ describe('Monopoly Integration Test', () => {
         console.info(`game balance: ${await balEther(game.address)}`)
         await token.transfer(game.address, ether(9999), { from: deployer })
         console.info(`game balance: ${await balEther(game.address)}`)
-        const value = await balOf(game.address)
-        expect(value).to.eq(ether(9999))
+        expect(await balOf(game.address)).to.eq(ether(9999))
 
         let i = 0
         while (i++ < 100) {
@@ -152,6 +151,6 @@ describe('Monopoly Integration Test', () => {
     })
 
     afterEach(async () => {
-        console.info('***************************************')
+        //console.info('***************************************')
     })
 })
