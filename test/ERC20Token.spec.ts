@@ -22,7 +22,7 @@ describe('ERC20Token', () => {
 
     let token: Contract
 
-    beforeEach(async () => {    
+    beforeEach(async () => {
         token = await deployContract(walletDeployer, ERC20Token, [], overrides)
         await token.transfer(walletAlice.address, ether(1000))
     })
@@ -46,8 +46,8 @@ describe('ERC20Token', () => {
 
     it('Transfer emits event', async () => {
         await expect(token.connect(walletAlice).transfer(walletBob.address, 100))
-        .to.emit(token, 'Transfer')
-        .withArgs(walletAlice.address, walletBob.address, 100)
+            .to.emit(token, 'Transfer')
+            .withArgs(walletAlice.address, walletBob.address, 100)
     })
 
     it('Can not transfer above the amount', async () => {
@@ -101,5 +101,4 @@ describe('ERC20Token', () => {
     it('Can not safe refund above the amount', async () => {
         await expect(token.safeRefund(walletAlice.address, ether(1001))).to.be.reverted
     })
-
 })

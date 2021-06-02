@@ -22,24 +22,22 @@ describe('UserCenter', () => {
 
     let uc: Contract
 
-    beforeEach(async () => {     
+    beforeEach(async () => {
         uc = await deployContract(walletDeployer, UserCenter, [], overrides)
     })
 
     it('Register a new user', async () => {
-        await uc.register(walletAlice.address) 
+        await uc.register(walletAlice.address)
         expect(await uc.totalUsers()).to.eq(1)
     })
 
-    it('Register emits event', async () => { 
-        await expect(uc.register(walletAlice.address) )
-        .to.emit(uc, 'UserRegistered');
+    it('Register emits event', async () => {
+        await expect(uc.register(walletAlice.address)).to.emit(uc, 'UserRegistered')
     })
 
     it('Check if a user exists', async () => {
-        await uc.register(walletAlice.address) 
+        await uc.register(walletAlice.address)
         expect(await uc.exists(walletAlice.address)).to.eq(true)
         expect(await uc.exists(walletBob.address)).to.eq(false)
     })
-
 })

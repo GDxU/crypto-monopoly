@@ -33,7 +33,7 @@ describe('Monopoly UnitTest', () => {
     let pe: Contract
     let gov: Contract
 
-    beforeEach(async () => {        
+    beforeEach(async () => {
         // deploy the Monopoly game
         token = await deployContract(walletDeployer, ERC20Token, [], overrides)
         uc = await deployContract(walletDeployer, UserCenter, [], overrides)
@@ -41,7 +41,7 @@ describe('Monopoly UnitTest', () => {
         pe = await deployContract(walletDeployer, PropertyExchange, [nft.address, token.address], overrides)
         gov = await deployContract(walletDeployer, Gov, [pe.address, token.address], overrides)
         game = await deployContract(walletDeployer, Game, [], overrides)
-        
+
         // initialize the Monopoly game
         await uc.addAdmin(game.address)
         await token.addAdmin(pe.address)
@@ -53,7 +53,6 @@ describe('Monopoly UnitTest', () => {
         await pe.addAdmin(game.address)
         await gov.addAdmin(game.address)
         await game.setup(nft.address, pe.address, token.address, uc.address, gov.address)
-
     })
 
     it('Calls maxNumberOfMove', async () => {
@@ -61,16 +60,15 @@ describe('Monopoly UnitTest', () => {
         expect(await game.maxNumberOfMove()).to.eq(50)
     })
 
-    it('Calls round', async () => { 
+    it('Calls round', async () => {
         expect(await game.round()).to.eq(1)
     })
 
-    it('Move and check the position', async () =>{
+    it('Move and check the position', async () => {
         await token.transfer(walletPlayer.address, ether(1000))
         await game.connect(walletPlayer).move(overrides)
         const pos = await uc.getPos(walletPlayer.address, 1)
         expect(pos).to.greaterThanOrEqual(2)
         expect(pos).to.lessThanOrEqual(12)
     })
-
 })

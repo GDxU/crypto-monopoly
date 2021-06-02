@@ -22,16 +22,21 @@ describe('PropertyExchange', () => {
         }
     })
 
-    const [walletDeployer, walletAlice, walletBob, walletBank] = provider.getWallets() 
+    const [walletDeployer, walletAlice, walletBob, walletBank] = provider.getWallets()
 
     let token: Contract
     let nft: Contract
     let propertyExchange: Contract
 
-    beforeEach(async () => {  
+    beforeEach(async () => {
         token = await deployMockContract(walletDeployer, ERC20Token.abi)
-        nft = await deployMockContract(walletDeployer, PropertyOwnership.abi)   
-        propertyExchange = await deployContract(walletDeployer, PropertyExchange, [nft.address, token.address], overrides)
+        nft = await deployMockContract(walletDeployer, PropertyOwnership.abi)
+        propertyExchange = await deployContract(
+            walletDeployer,
+            PropertyExchange,
+            [nft.address, token.address],
+            overrides
+        )
     })
 
     it('New round and house avg price', async () => {
@@ -42,8 +47,8 @@ describe('PropertyExchange', () => {
 
     it('Buy a house', async () => {
         await token.mock.balanceOf.withArgs(walletAlice.address).returns(ether(1000))
-        await nft.mock.transfer.returns();
-        await nft.mock.ownerOf.returns(walletBob.address);
+        await nft.mock.transfer.returns()
+        await nft.mock.ownerOf.returns(walletBob.address)
         expect(await propertyExchange.hasProperty(1)).to.eq(false)
         await propertyExchange.buy(walletAlice.address, 1, 10)
         expect(await propertyExchange.hasProperty(1)).to.eq(true)
@@ -52,8 +57,9 @@ describe('PropertyExchange', () => {
     it('Mortgage: Bankrupt emits event', async () => {
         await token.mock.balanceOf.withArgs(walletAlice.address).returns(ether(1000))
         await nft.mock.tokensOfOwner.returns([])
-        await expect(propertyExchange.mortgage(walletAlice.address, walletBank.address, ether(1001)))
-        .to.emit(propertyExchange, 'Bankrupt')
-    }) 
-
+        await expect(propertyExchange.mortgage(walletAlice.address, walletBank.address, ether(1001))).to.emit(
+            propertyExchange,
+            'Bankrupt'
+        )
+    })
 })

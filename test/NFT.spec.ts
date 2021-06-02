@@ -23,12 +23,12 @@ describe('NFT', () => {
     const blackholeAddress = '0x0000000000000000000000000000000000000000'
     let nft: Contract
 
-    beforeEach(async () => {    
+    beforeEach(async () => {
         nft = await deployContract(walletDeployer, PropertyOwnership, [], overrides)
     })
 
     const mint = async (toAddress: string, nftId: number) => {
-        // mint: from address 0x0 
+        // mint: from address 0x0
         await nft.transfer(blackholeAddress, toAddress, nftId)
     }
 
@@ -59,8 +59,8 @@ describe('NFT', () => {
     it('Transfer emits event', async () => {
         await mint(walletAlice.address, 1)
         await expect(nft.transfer(walletAlice.address, walletBob.address, 1))
-        .to.emit(nft, 'Transfer')
-        .withArgs(walletAlice.address, walletBob.address, 1)
+            .to.emit(nft, 'Transfer')
+            .withArgs(walletAlice.address, walletBob.address, 1)
     })
 
     it('Can not transfer above the amount', async () => {
@@ -98,10 +98,9 @@ describe('NFT', () => {
         await mint(walletAlice.address, 1)
         await mint(walletBob.address, 2)
         await mint(walletAlice.address, 3)
-        const tokensOfAlice = (await nft.tokensOfOwner(walletAlice.address)).map((x:BigNumber) => x.toNumber())
-        const tokensOfBob = (await nft.tokensOfOwner(walletBob.address)).map((x:BigNumber) => x.toNumber())
-        expect(tokensOfAlice).to.have.ordered.members([1,3])
+        const tokensOfAlice = (await nft.tokensOfOwner(walletAlice.address)).map((x: BigNumber) => x.toNumber())
+        const tokensOfBob = (await nft.tokensOfOwner(walletBob.address)).map((x: BigNumber) => x.toNumber())
+        expect(tokensOfAlice).to.have.ordered.members([1, 3])
         expect(tokensOfBob).to.have.ordered.members([2])
     })
-
 })

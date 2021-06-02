@@ -23,7 +23,7 @@ describe('Monopoly Integration Test', () => {
             gasLimit: 9999999
         }
     })
-    
+
     const [wallet, p0, p1, p2] = provider.getWallets()
 
     const deployer = wallet.address
@@ -42,7 +42,7 @@ describe('Monopoly Integration Test', () => {
     let pe: Contract
     let gov: Contract
 
-    beforeEach(async () => {       
+    beforeEach(async () => {
         console.info(`deploying the Monopoly game...`)
 
         token = await deployContract(wallet, ERC20Token, [], overrides)
@@ -51,7 +51,7 @@ describe('Monopoly Integration Test', () => {
         pe = await deployContract(wallet, PropertyExchange, [po.address, token.address], overrides)
         gov = await deployContract(wallet, Gov, [pe.address, token.address], overrides)
         game = await deployContract(wallet, Game, [], overrides)
-        
+
         console.info(`initializing the Monopoly game...`)
 
         await uc.addAdmin(game.address)
@@ -81,7 +81,9 @@ describe('Monopoly Integration Test', () => {
         const moveOptions = { ...overrides }
         const playerWallect = wallets[_account]
         let round = await game.round()
-        console.info(`***************** #${num} round=${round}, (${msg} move and buy/upgrade house)**********************`)
+        console.info(
+            `***************** #${num} round=${round}, (${msg} move and buy/upgrade house)**********************`
+        )
         let pos = await uc.getPos(_account, round)
         console.info(`from pos: ${pos}`)
         await game.connect(playerWallect).move(moveOptions)
@@ -109,12 +111,14 @@ describe('Monopoly Integration Test', () => {
             console.info(`${msg} houses:  ${await pe.getProperties(_account)} `)
 
             const [winner, num, fund, total] = await game.getWinner()
-            console.info(`round=${await game.round()}, winner: ${winner}, num: ${num}, fund: ${fund}, total: ${toEther(total)}`)
+            console.info(
+                `round=${await game.round()}, winner: ${winner}, num: ${num}, fund: ${fund}, total: ${toEther(total)}`
+            )
         } else {
             console.info(`It's not an empty land in the position: ${pos}`)
         }
 
-        console.info(`p0: ${await balEther(investor)}, p1: ${await balEther(player1)}, p2: ${await balEther(player2)}`) 
+        console.info(`p0: ${await balEther(investor)}, p1: ${await balEther(player1)}, p2: ${await balEther(player2)}`)
 
         const totalAmount = (await balOf(investor))
             .add(await balOf(player1))
@@ -122,7 +126,9 @@ describe('Monopoly Integration Test', () => {
             .add(await game.bonusPool())
 
         console.info(
-            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(totalAmount)}`
+            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(
+                totalAmount
+            )}`
         )
 
         num++
