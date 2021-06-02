@@ -41,13 +41,12 @@ contract PropertyExchange is PropertyBase, AdminRole {
         avgPrice = _avg;
     }
 
-    /* mortgage houses to pay money to others */
+    /* mortgage houses and take its token to others */
     function mortgage(
         address player,
         address bank,
         uint256 token_load
     ) external onlyAdmin {
-        //uint256 token_load = _price2Token(load_money);
         uint256 token_balance = _token.balanceOf(player);
 
         if (token_balance < token_load) {
@@ -92,7 +91,6 @@ contract PropertyExchange is PropertyBase, AdminRole {
 
         uint256 bal = _token.balanceOf(msg.sender);
         if (bal <= token_load) {
-            //token_load = bal;
             // bankrupt
             emit Bankrupt(msg.sender);
         }
@@ -214,36 +212,6 @@ contract PropertyExchange is PropertyBase, AdminRole {
         return res;
     }
 
-    /*
-        //TODO: use getPropertyIndexes to refactor
-        function getProperties(address _owner) public view returns (uint16[] memory){
-            uint256[] memory houseIds = _po.tokensOfOwner(_owner);
-            if (houseIds.length > 0) {
-                uint16 _num = 0;
-                int i = int(houseIds.length) - 1;
-                uint16[] memory ps = new uint16[](houseIds.length);
-                while (i >= 0) {
-                    uint32 index = uint32(houseIds[uint(i)]);
-                    if (!_isOnlinePropertyId(index)) {
-                        break;
-                    }
-                    uint16 _pos = _getPos(index);
-                    ps[_num] = _pos;
-                    _num++;
-                    i--;
-                }
-
-                uint16[] memory res = new uint16[](_num);
-                uint16 j = 0;
-                while (j < _num) {
-                    res[j] = ps[j];
-                    j++;
-                }
-
-                return res;
-            }
-        }*/
-
     function getPropertySummary(address _owner) public view returns (uint16, uint256) {
         uint16 pos = 1;
         uint32[NUMBER_OF_PROPERTY] memory pis = getPropertyIndexes(round);
@@ -269,7 +237,7 @@ contract PropertyExchange is PropertyBase, AdminRole {
         return _price2Token(_price);
     }
 
-    /**************************** internal functions ********************************/
+    /**************************** private and internal functions ********************************/
 
     function _price2Token(uint256 _price) private pure returns (uint256) {
         return uint256(_price).mul(1 ether);
@@ -309,7 +277,6 @@ contract PropertyExchange is PropertyBase, AdminRole {
         /* 32b: gene, 32[40b]: time, 72[16b]: buy price, 88[16b]: rent price, 104:  */
         uint32 _index = _getIndex(_pos);
         uint256 _property = properties[_index];
-        //uint16 _rent_price = _getRentPrice(_property).add(_buy_price >> 3);
         uint256 _gene_n_date = _property & (0xFFFFFFFFFFFFFFFFFF);
         /*2**72-1*/
         uint256 new_property = _gene_n_date | (uint256(_buy_price) << 72) | (uint256(_rent_price) << 88);
@@ -339,8 +306,6 @@ contract PropertyExchange is PropertyBase, AdminRole {
         uint256 _gene_n_date = _property & (0xFFFFFFFFFFFFFFFFFF);
         uint256 new_property = _gene_n_date | (uint256(_buy_price) << 72) | (uint256(_rent_price) << 88);
         properties[_index] = new_property;
-        //_calAvgPrice(_buy_price);
-        //trades++;
     }
 
     function _canBuy(address _buyer, uint16 _pos) internal view returns (bool) {
@@ -356,30 +321,19 @@ contract PropertyExchange is PropertyBase, AdminRole {
         return false;
     }
 
-    //    function _calAvgPrice(uint16 _buy_price) private {
-    //        avgPrice = avgPrice.mul(trades).add(_buy_price).div(trades + 1);
-    //    }
-
     function _getNewestPrice(uint16 _pos) internal view returns (uint16, uint16) {
         uint256 p = _getOptionalProperty(_pos);
         if (p == 0) {
-            //raw land
-            //cpi.mul(uint16(r & 0x7).add(5)).add(uint16(avgPrice) >> 1);
-            //cpi.mul(uint16(r & 0x3).add(2)).add(uint16(avgPrice) >> 2);
+            // raw land
             uint16 buy_price = Rand.rand16(avgPrice >> 1, (avgPrice * 3) / 2);
             uint16 rent_price = Rand.rand16(avgPrice >> 2, avgPrice);
             buy_price = _limit(buy_price, 10000);
             rent_price = _limit(rent_price, 5000);
             return (buy_price, rent_price);
         } else {
+            // w/ house 
             uint16 buy_price = _getBuyPrice(p);
             uint16 rent_price = _getRentPrice(p);
-            //        uint16 new_price = uint16(((buy_price * 3) / 2) + (rent_price >> 1) + (avgPrice >> 1) );//+ rent_price >> 1 + avgPrice) >> 1
-            //        if (new_price > 10000) {
-            //            new_price = 10000;
-            //        }
-            /* price += (rand(avg/4, avg/2) );
-            rent +=  rand(price/8, price/2); */
             buy_price += Rand.rand16(avgPrice >> 2, avgPrice >> 1);
             buy_price = _limit(buy_price, 10000);
             rent_price += Rand.rand16(buy_price >> 3, buy_price >> 1);
@@ -393,7 +347,6 @@ contract PropertyExchange is PropertyBase, AdminRole {
     }
 
     function _getBuyPrice(uint256 value) internal pure returns (uint16) {
-        /*2**16-1*/
         return uint16((value >> 72) & (0xFFFF));
     }
 
@@ -434,13 +387,11 @@ contract PropertyExchange is PropertyBase, AdminRole {
     }
 
     function _setIndex(uint16 _pos, uint32 _index) internal {
-        //posToIndex[uint32(_pos) + _offset] = _index;
         indexToPos[_index] = _pos;
     }
 
     function _getIndex(uint16 _pos) internal view returns (uint32) {
         return _propertyIndexes[round][_pos];
-        //posToIndex[uint32(_pos) + _offset];
     }
 
     function _getPos(uint32 _index) internal view returns (uint16) {

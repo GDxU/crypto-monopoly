@@ -33,13 +33,8 @@ contract Gov is AdminRole {
         uint16 pos,
         uint256 token_penalty
     ) external onlyAdmin {
-        //uint256 token_penalty = _pe.price2Token(penalty_fee);
         _pe.mortgage(player, bank, token_penalty);
-
         _token.safeTransfer(player, bank, token_penalty);
-        // require(_token.approve(address(this), token_penalty), 'Fails to approve [Gov]');
-
-        // _token.transferFrom(msg.sender, bank, token_penalty);
 
         emit Fine(group, player, pos, token_penalty);
     }

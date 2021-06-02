@@ -17,7 +17,7 @@ const overrides = {
     gasPrice: 0
 }
 
-describe('MonopolyTest', () => {
+describe('Monopoly Integration Test', () => {
     const provider = new MockProvider({
         ganacheOptions: {
             gasLimit: 9999999
@@ -43,39 +43,30 @@ describe('MonopolyTest', () => {
     let pe: Contract
     let gov: Contract
 
-    beforeEach(async () => {
-        console.info(`${deployer}: ${await wallet.getBalance()}`)
-
-        // const deployerOptions = { ...overrides, from: await wallet.getAddress() }
+    beforeEach(async () => {       
+        console.info(`deploying the Monopoly game...`)
 
         token = await deployContract(wallet, ERC20Token, [], overrides)
-        console.info(`"Token": "${token.address}",`)
         uc = await deployContract(wallet, UserCenter, [], overrides)
-        console.info(`"UserCenter": "${uc.address}",`)
         po = await deployContract(wallet, PropertyOwnership, [], overrides)
-        console.info(`"PropertyOwnership": "${po.address}",`)
         pe = await deployContract(wallet, PropertyExchange, [po.address, token.address], overrides)
-        console.info(`"PropertyExchange": "${pe.address}",`)
         gov = await deployContract(wallet, Gov, [pe.address, token.address], overrides)
-        console.info(`"Gov": "${gov.address}",`)
         game = await deployContract(wallet, Game, [], overrides)
-        console.info(`"Game": "${game.address}"`)
-        await game.setMaxNumberOfMove(50)
-        console.info(`setMaxNumberOfMove 50`)
+        
+        console.info(`initializing the Monopoly game...`)
 
         await uc.addAdmin(game.address)
-        console.info(`init uc.`)
         await token.addAdmin(pe.address)
         await token.addAdmin(gov.address)
         await token.addAdmin(game.address)
-        console.info(`init token.`)
         await po.addAdmin(pe.address)
         await po.addAdmin(game.address)
         await pe.addAdmin(gov.address)
         await pe.addAdmin(game.address)
         await gov.addAdmin(game.address)
         await game.setup(po.address, pe.address, token.address, uc.address, gov.address)
-        console.info(`init game.`)
+
+        console.info(`Monopoly game is ready!`)
     })
 
     const balOf = async (_account: string) => {
@@ -91,20 +82,19 @@ describe('MonopolyTest', () => {
         const moveOptions = { ...overrides }
         const playerWallect = wallets[_account]
         let round = await game.round()
-        console.info(`***************** #${num} round=${round}, (${msg} move and buy)**********************`)
+        console.info(`***************** #${num} round=${round}, (${msg} move and buy/upgrade house)**********************`)
         let pos = await uc.getPos(_account, round)
         console.info(`from pos: ${pos}`)
-        //await game.connect(playerWallect).moveTo(r1, r2, moveOptions)
         await game.connect(playerWallect).move(moveOptions)
         round = await game.round()
         pos = await uc.getPos(_account, round)
         console.info(`to pos: ${pos}`)
         if ((await game.connect(playerWallect).canBuy(pos, moveOptions)) && (await balOf(_account)).gt(0)) {
-            console.info(`pos: ${pos}, can buy!`)
+            // console.info(`pos: ${pos}, can buy!`)
             try {
                 await game.connect(playerWallect).buy(moveOptions)
             } catch (err) {
-                console.info(`********* buy error :${err} ********`)
+                console.info(`********* fail to buy house :${err} ********`)
             }
             console.info(
                 `pos: ${pos}, buy price: ${await pe.buyPrice(
@@ -119,17 +109,13 @@ describe('MonopolyTest', () => {
             //console.info(`number of house: ${await po.balanceOf(_account)}`);|| ${await po.tokensOfOwner(_account)}
             console.info(`${msg} houses:  ${await pe.getProperties(_account)} `)
 
-            const res = await game.getWinner()
-            // console.info(`res---------------\n`, res)
             const [winner, num, fund, total] = await game.getWinner()
-            console.info(
-                `round=${await game.round()}, winner: ${winner}, num: ${num}, fund: ${fund}, total: ${toEther(total)}`
-            )
+            console.info(`round=${await game.round()}, winner: ${winner}, num: ${num}, fund: ${fund}, total: ${toEther(total)}`)
         } else {
-            console.info(`********* cannot buy ${pos}********`)
+            console.info(`It's not an empty land in the position: ${pos}`)
         }
 
-        console.info(`p0: ${await balEther(investor)}, p1: ${await balEther(player1)}, p2: ${await balEther(player2)}`) //, poorman: ${(await balOf(poorman))}
+        console.info(`p0: ${await balEther(investor)}, p1: ${await balEther(player1)}, p2: ${await balEther(player2)}`) 
 
         const totalAmount = (await balOf(investor))
             .add(await balOf(player1))
@@ -137,20 +123,13 @@ describe('MonopolyTest', () => {
             .add(await game.bonusPool())
 
         console.info(
-            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(
-                totalAmount
-            )}}`
+            `game balance: ${await balEther(game.address)}, ${toEther(await game.bonusPool())} , total: ${toEther(totalAmount)}`
         )
 
         num++
     }
 
-    it('get maxNumberOfMove', async () => {
-        const value = await game.maxNumberOfMove()
-        expect(value.toString()).to.eq('50')
-    })
-
-    it('move test', async () => {
+    it('Monopoly Integration Test', async () => {
         await token.transfer(investor, ether(1000), { from: deployer })
         await token.transfer(player1, ether(1000), { from: deployer })
         await token.transfer(player2, ether(1000), { from: deployer })

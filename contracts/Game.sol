@@ -31,7 +31,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     uint16 public constant version = 10001; //v1.0.1
     uint24 public round = 0;
     uint16 public steps = 0;
-    //uint256 public penaltyPool = 0;
     uint32 public numberOfMove = 0;
     uint32 public maxNumberOfMove = 200;
     uint16 public numberOfProperty = 0;
@@ -50,7 +49,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
     modifier onlyMember() {
         require(msg.sender != address(0), 'sender address is 0x0');
         require(_token.balanceOf(msg.sender) > 0, 'member has no token');
-        //require(_uc.exists(msg.sender), "user not exists");
         _;
     }
 
@@ -136,7 +134,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         } else if (_isJail(pos)) {
             uint256 token_penalty = _price2Token(_jailPenalty());
             _gov.fine(1, msg.sender, address(this), pos, token_penalty);
-            //penaltyPool = penaltyPool.add(token_penalty);
             return;
         } else if (_isLottery(pos)) {
             uint256 _bonus = _lotteryReward();
@@ -153,7 +150,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
                 emit Reward(2, msg.sender, pos, token_question);
             } else {
                 _gov.fine(2, msg.sender, address(this), pos, token_question);
-                //penaltyPool = penaltyPool.add(token_question);
             }
         } else {
             // check rent
@@ -208,8 +204,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
             // new house
             _payTax(msg.sender, token_buy / 10);
             _transferToken(address(this), token_buy.sub(token_buy / 10));
-            //_propertyPositions[round].push(_pos);
-            //_propertyIndexes[round][_pos] = _pe.propertyId(_pos);//1;//_index;
             numberOfProperty++;
         } else {
             // pay to game
@@ -270,7 +264,7 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         return _lotteryReward();
     }
 
-    /*************************** private *****************************************/
+    /*************************** private functions *****************************************/
 
     function _rewardToken(address _receiver, uint256 _amount) private returns (bool) {
         return _token.transfer(_receiver, _amount);
@@ -278,9 +272,6 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
 
     function _transferToken(address _receiver, uint256 _amount) private returns (bool) {
         _token.safeTransfer(msg.sender, _receiver, _amount);
-        // require(_token.approve(address(this), _amount), 'Fails to approve [Game]');
-
-        // return _token.transferFrom(msg.sender, _receiver, _amount);
     }
 
     function _rollValue(uint8 r1, uint8 r2) private pure returns (uint16) {
@@ -371,12 +362,12 @@ contract Game is AdminRole, Pausable, ReentrancyGuard {
         //10% for the commission
         _payTax(address(this), _total / 10);
 
-        //60%
+        //60% for the winner
         uint256 bonus = _total.mul(60).div(100);
         _rewardToken(_winner, bonus);
 
         //30% left for the next game's bonus
-
+        
         emit Win(_winner, round, bonus, _num, now);
     }
 

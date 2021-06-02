@@ -42,7 +42,7 @@
     "postcompile": "# compiled",
     "pretest": "yarn compile",
     "test": "mocha",
-    "test-game": "mocha test/Monopoly.spec",
+    "test-game": "mocha test/Monopoly.IntegrationTest.spec",
     "prepublishOnly": "yarn test"
   },
   "license": "GPL-3.0-or-later"

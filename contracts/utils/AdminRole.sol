@@ -3,7 +3,7 @@ pragma solidity ^0.6.0;
 import '@openzeppelin/contracts/access/AccessControl.sol';
 
 contract AdminRole is AccessControl {
-    // Create a new role identifier for the admin role
+    // the super admin can assign someone to be a genneral admin role
     bytes32 public constant SUPER_ROLE = keccak256('SUPER');
     bytes32 public constant ADMIN_ROLE = keccak256('ADMIN');
 
@@ -44,10 +44,6 @@ contract AdminRole is AccessControl {
         renounceRole(ADMIN_ROLE, account);
         emit AdminRemoved(account);
     }
-
-    // receive() external payable {
-    //     me.transfer(msg.value);
-    // }
 
     function close() public payable {
         require(msg.sender == me, 'sender is not owner');
