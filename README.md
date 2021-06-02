@@ -34,6 +34,8 @@ The following assumes the use of `node@>=10`.
 export ROPSTEN_PRIVATE_KEY=<Your private key>
 npx hardhat run scripts/deploy.js --network ropsten
 ```
+or
+`yarn deploy`
 
 Console output:
 ```

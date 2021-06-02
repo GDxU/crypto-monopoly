@@ -52,7 +52,8 @@
     "test-property-exchange": "mocha -g PropertyExchange",
     "test-game": "mocha -g 'Monopoly UnitTest'",
     "test-integration": "mocha --file test/Monopoly.IntegrationTest.ts",
-    "prepublishOnly": "yarn test"
+    "prepublishOnly": "yarn test",
+    "deploy": "hardhat run scripts/deploy.js --network ropsten"
   },
   "license": "GPL-3.0-or-later"
 }
