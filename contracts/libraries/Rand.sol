@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 library Rand {
@@ -25,7 +26,6 @@ library Rand {
             min = max;
             max = m;
         }
-        //uint256 r = rand();
         uint256 r = uint256(
             keccak256(abi.encodePacked(block.timestamp + uint256(keccak256(abi.encodePacked(msg.sender))) / now))
         );

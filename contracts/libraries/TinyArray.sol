@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 import './SafeMath16.sol';
@@ -11,7 +12,6 @@ library TinyArray {
     }
 
     function init(Data storage self, uint16 maxLength) internal {
-        //self =  Data({array: new uint16[](0), index:0, maxLength: 5});
         self.maxLength = maxLength;
         clear(self);
     }
@@ -42,7 +42,7 @@ library TinyArray {
     }
 
     function clear(Data storage self) internal {
-        delete self.array; //.length = 0;
+        delete self.array; 
         self.index = 0;
     }
 }

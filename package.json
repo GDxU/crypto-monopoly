@@ -42,6 +42,7 @@
     "postcompile": "# compiled",
     "pretest": "yarn compile",
     "test": "mocha",
+    "test-erc20-token": "mocha -g ERC20Token",
     "test-game": "mocha test/Monopoly.IntegrationTest.spec",
     "prepublishOnly": "yarn test"
   },
