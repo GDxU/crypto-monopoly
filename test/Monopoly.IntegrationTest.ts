@@ -23,8 +23,7 @@ describe('Monopoly Integration Test', () => {
             gasLimit: 9999999
         }
     })
-    /* accounts: [{ balance: 'BALANCE IN WEI', secretKey: 'PRIVATE KEY' }] */
-
+    
     const [wallet, p0, p1, p2] = provider.getWallets()
 
     const deployer = wallet.address
