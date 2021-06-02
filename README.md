@@ -1,10 +1,11 @@
 # Crypto Monopoly Game
 Crypto Monopoly Game (Smart Contracts)
-- ERC20:  Game Token
-- ERC721: NFT Property
-- Solidity: ^0.6.6
-- Tool:  ethereum-waffle
-- UnitTest: TypeScript + mocha + chai
+- ERC20:     Game Token
+- ERC721:    NFT Property
+- Solidity:  ^0.6.6
+- Tool:      ethereum-waffle
+- UnitTest:  TypeScript + mocha + chai
+- Deploy:    hardhat + alchemyapi
 
 # Local Development
 
@@ -22,7 +23,13 @@ The following assumes the use of `node@>=10`.
 
 `yarn test`
 
-## Deploy to testnet
+
+## Integration Tests
+
+`yarn test-integration`
+
+## Deploy to Testnet
+
 ```
 export ROPSTEN_PRIVATE_KEY=<Your private key>
 npx hardhat run scripts/deploy.js --network ropsten
