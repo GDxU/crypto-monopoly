@@ -32,11 +32,11 @@ describe('ERC20Token', () => {
     })
 
     it('Check token symbol', async () => {
-        expect(await token.symbol()).to.eq('CHIS')
+        expect(await token.symbol()).to.eq('CC')
     })
 
     it('Check token name', async () => {
-        expect(await token.name()).to.eq('Chis Finance')
+        expect(await token.name()).to.eq('CC Token https://github.com/coolcode')
     })
 
     it('Transfer adds amount to destination account', async () => {
@@ -66,5 +66,39 @@ describe('ERC20Token', () => {
     it('Calls balanceOf with sender address on Token contract', async () => {
         await token.balanceOf(walletAlice.address)
         expect('balanceOf').to.be.calledOnContractWith(token, [walletAlice.address])
+    })
+
+    it('Send candy to destination account', async () => {
+        await token.sendCandy(walletBob.address, ether(10))
+        expect(await token.candyOf(walletBob.address)).to.eq(ether(10))
+        expect(await token.balanceOf(walletBob.address)).to.eq(ether(10))
+        expect(await token.tokenOf(walletBob.address)).to.eq(ether(0))
+    })
+
+    it('Safe mint to destination account', async () => {
+        await token.safeMint(walletAlice.address, ether(10))
+        expect(await token.balanceOf(walletAlice.address)).to.eq(ether(1010))
+        expect(await token.tokenOf(walletAlice.address)).to.eq(ether(1010))
+    })
+
+    it('Safe burn to destination account', async () => {
+        await token.safeBurn(walletAlice.address, ether(10))
+        expect(await token.balanceOf(walletAlice.address)).to.eq(ether(990))
+        expect(await token.tokenOf(walletAlice.address)).to.eq(ether(990))
+    })
+
+    it('Safe transfer to destination account', async () => {
+        await token.safeTransfer(walletAlice.address, walletBob.address, ether(10))
+        expect(await token.balanceOf(walletAlice.address)).to.eq(ether(990))
+        expect(await token.balanceOf(walletBob.address)).to.eq(ether(10))
+    })
+
+    it('Safe refund from destination account', async () => {
+        await token.safeRefund(walletAlice.address, ether(10))
+        expect(await token.balanceOf(walletAlice.address)).to.eq(ether(990))
+    })
+
+    it('Can not safe refund above the amount', async () => {
+        await expect(token.safeRefund(walletAlice.address, ether(1001))).to.be.reverted
     })
 })

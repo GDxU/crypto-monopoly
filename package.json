@@ -1,14 +1,14 @@
 {
-  "name": "@coolcode/v1-chis-finance",
+  "name": "@coolcode/v2-periphery",
   "version": "1.1.0-beta.0",
-  "description": "🎚 Peripheral smart contracts for interacting with Chis Finance",
+  "description": "🎚 Peripheral smart contracts for interacting with Crypto Monopoly",
   "engines": {
     "node": ">=10"
   },
-  "homepage": "https://github.com/chis-finance",
+  "homepage": "https://github.com/coolcode",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chis-finance/chis"
+    "url": "https://github.com/coolcode/crypto-monopoly"
   },
   "files": [
     "build",
@@ -46,7 +46,12 @@
     "pretest": "yarn compile",
     "test": "mocha",
     "test-erc20": "mocha -g ERC20Token",
-    "test-integration": "mocha --file test/ERC20Token.spec.ts",
+    "test-gov": "mocha -g Gov",
+    "test-nft": "mocha -g NFT",
+    "test-user-center": "mocha -g UserCenter",
+    "test-property-exchange": "mocha -g PropertyExchange",
+    "test-game": "mocha -g 'Monopoly UnitTest'",
+    "test-integration": "mocha --file test/Monopoly.IntegrationTest.ts",
     "prepublishOnly": "yarn test",
     "deploy": "hardhat run scripts/deploy.js --network ropsten"
   },
